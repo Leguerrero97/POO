@@ -1,0 +1,9 @@
+[{
+  "_id": {
+    "$oid": "6617162d31ca90d4f5a8b7fc"
+  },
+  "nombre": "Albrecht",
+  "apellido": "Von Wallenstein",
+  "usuario": "AWALLENSTEIN",
+  "clave": "12345"
+}]
