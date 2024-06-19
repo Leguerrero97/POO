@@ -1,30 +1,23 @@
 #include "formulario.h"
 
 Formulario::Formulario(QWidget *parent) : QWidget(parent) {
-    QLabel *labelLegajo = new QLabel("Legajo:");
-    QLabel *labelNombre = new QLabel("Nombre:");
-    QLabel *labelApellido = new QLabel("Apellido:");
+    QGridLayout *layout = new QGridLayout(this);
 
-    QLineEdit *lineEditLegajo = new QLineEdit;
-    QLineEdit *lineEditNombre = new QLineEdit;
-    QLineEdit *lineEditApellido = new QLineEdit;
+    QLabel *legajoLabel = new QLabel("Legajo:", this);
+    QLineEdit *legajoField = new QLineEdit(this);
 
-    QPushButton *buttonGuardar = new QPushButton("Guardar");
+    QLabel *nombreLabel = new QLabel("Nombre:", this);
+    QLineEdit *nombreField = new QLineEdit(this);
 
-    QGridLayout *layout = new QGridLayout;
-    layout->addWidget(labelLegajo, 0, 0);
-    layout->addWidget(lineEditLegajo, 0, 1);
-    layout->addWidget(labelNombre, 1, 0);
-    layout->addWidget(lineEditNombre, 1, 1);
-    layout->addWidget(labelApellido, 2, 0);
-    layout->addWidget(lineEditApellido, 2, 1);
-    layout->addWidget(buttonGuardar, 3, 0, 1, 2);
+    QLabel *apellidoLabel = new QLabel("Apellido:", this);
+    QLineEdit *apellidoField = new QLineEdit(this);
+
+    layout->addWidget(legajoLabel, 0, 0);
+    layout->addWidget(legajoField, 0, 1);
+    layout->addWidget(nombreLabel, 1, 0);
+    layout->addWidget(nombreField, 1, 1);
+    layout->addWidget(apellidoLabel, 2, 0);
+    layout->addWidget(apellidoField, 2, 1);
 
     setLayout(layout);
-
-    connect(buttonGuardar, SIGNAL(clicked()), this, SLOT(guardarDatos()));
-}
-
-void Formulario::guardarDatos() {
-    QMessageBox::information(this, "Información", "Datos guardados correctamente.");
 }

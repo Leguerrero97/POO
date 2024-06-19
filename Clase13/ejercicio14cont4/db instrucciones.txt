@@ -1,0 +1,9 @@
+Listar tablas: Para ver las tablas en tu base de datos, ejecuta la siguiente consulta SQL: .tables
+
+Ver esquema de una tabla: Para ver la estructura de una tabla (columnas y sus tipos), ejecuta: .schema nombre_de_la_tabla
+
+Listar registros: Para mostrar todos los registros de una tabla, ejecuta: SELECT * FROM nombre_de_la_tabla;
+
+Salir de SQLite: Para salir de SQLite, escribe .quit y presiona Enter
+
+usuario y clave ya registrados: lautaro 827ccb0eea8a706c4c34a16891f84e7b 12345

@@ -2,37 +2,42 @@
 #define LOGIN_H
 
 #include <QWidget>
-#include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QLabel>
 #include <QGridLayout>
-#include <QMessageBox>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
-#include <QJsonDocument>
-#include <QJsonObject>
 #include <QUrl>
-#include <QDebug> // Agregar inclusión para usar qDebug()
-#include "formulario.h" // Incluir el archivo de encabezado de Formulario si es necesario
+#include <QImage>
 
 class Login : public QWidget {
     Q_OBJECT
+
 public:
     Login(QWidget *parent = nullptr);
+    ~Login();
 
-public slots:
-    void verificarClave();
-    void toggleTemperatura();
-    void slot_descargaFinalizada(QNetworkReply *reply);
+protected:
+    void paintEvent(QPaintEvent *event) override;
+    void setBackgroundImage(const QUrl &url);
+
+private slots:
+    void handleLogin();
+    void fetchTemperature();
+    void displayTemperature(QNetworkReply *reply);
+    void toggleTemperatureDisplay();
+    void backgroundImageDownloaded(QNetworkReply *reply);
 
 private:
-    QLineEdit *lineEditUsuario;
-    QLineEdit *lineEditClave;
-    QPushButton *buttonMostrarTemperatura;
-    QLabel *labelTemperatura;
-    QNetworkAccessManager *manager;
-
-    void obtenerTemperatura();
+    QLineEdit *usernameField;
+    QLineEdit *passwordField;
+    QPushButton *loginButton;
+    QLabel *temperatureLabel;
+    QPushButton *toggleTempButton;
+    QNetworkAccessManager *networkManager;
+    QImage backgroundImage; // Se usa QImage en lugar de QPixmap
+    bool isTempVisible;
 };
 
 #endif // LOGIN_H
