@@ -1,56 +1,53 @@
 #include "admindb.h"
 #include <QDebug>
-#include <QSqlQuery>
-#include<QSqlError>
+#include <QNetworkRequest>
+#include <QUrlQuery>
+#include <QJsonDocument>
+#include <QJsonObject>
 
-AdminDB::AdminDB(QObject *parent) : QObject(parent) {
-    conectar("C:/Users/Lautaro/Documents/Qt/Clase12/ejercicio14cont3/14db.sqlite");
+AdminDB::AdminDB(QObject *parent)
+    : QObject(parent), loginValido(false) {
+    networkManager = new QNetworkAccessManager(this);
+    connect(networkManager, &QNetworkAccessManager::finished, this, &AdminDB::handleLoginResponse);
 }
 
-bool AdminDB::conectar(const QString &archivoSqlite) {
-    db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName(archivoSqlite);
-    if (!db.open()) {
-        qDebug() << "Error al abrir la base de datos:" << db.lastError().text();
-        return false;
-    }
-    return true;
+AdminDB::~AdminDB() {
+    delete networkManager;
 }
 
 bool AdminDB::validarUsuario(const QString &usuario, const QString &clave) {
-    if (!db.isOpen()) {
-        qDebug() << "Error: La base de datos no está abierta.";
-        return false;
-    }
+    QUrlQuery postData;
+    postData.addQueryItem("username", usuario);
+    postData.addQueryItem("password", clave);
 
-    QSqlQuery query(db);
-    query.prepare("SELECT * FROM usuarios WHERE usuario = :usuario AND clave = :clave");
-    query.bindValue(":usuario", usuario);
-    query.bindValue(":clave", clave);
+    QNetworkRequest request(QUrl(endpointUrl));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
+    networkManager->post(request, postData.toString().toUtf8());
 
-    if (query.exec() && query.next()) {
-        return true;
+    // Espera la respuesta de FastAPI usando un QEventLoop
+    eventLoop.exec();
+
+    return loginValido;
+}
+
+void AdminDB::handleLoginResponse(QNetworkReply *reply) {
+    if (reply->error() == QNetworkReply::NoError) {
+        QByteArray responseData = reply->readAll();
+        QJsonDocument jsonResponse = QJsonDocument::fromJson(responseData);
+        QJsonObject jsonObject = jsonResponse.object();
+
+        // Verifica la respuesta JSON (ajusta según la estructura de tu respuesta)
+        if (jsonObject.contains("status") && jsonObject["status"].toString() == "success") {
+            loginValido = true;
+        } else {
+            loginValido = false;
+        }
     } else {
-        qDebug() << "Error en la consulta:" << query.lastError().text();
-        return false;
-    }
-}
-
-bool AdminDB::registrar(QString evento) {
-    if (!db.isOpen()) {
-        return false;
+        qDebug() << "Error en la solicitud de red:" << reply->errorString();
+        loginValido = false;
     }
 
-    QSqlQuery query(db);
-    query.prepare("INSERT INTO registros (evento) VALUES (:evento)");
-    query.bindValue(":evento", evento);
-    if (!query.exec()) {
-        qDebug() << "Error al registrar evento:" << query.lastError().text();
-        return false;
-    }
-    return true;
-}
-
-QSqlDatabase AdminDB::getDB() const {
-    return db;
+    // Sale del QEventLoop
+    eventLoop.quit();
+    reply->deleteLater();
 }

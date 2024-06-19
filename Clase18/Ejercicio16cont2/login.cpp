@@ -8,7 +8,6 @@
 #include <QTimer>
 #include <QSettings>
 #include <QStandardPaths>
-#include "formulario.h"
 #include "admindb.h"
 
 Login::Login(QWidget *parent) : QWidget(parent),

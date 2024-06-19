@@ -2,20 +2,27 @@
 #define ADMINDB_H
 
 #include <QObject>
-#include <QSqlDatabase>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QEventLoop>
 
 class AdminDB : public QObject {
     Q_OBJECT
 public:
-    explicit AdminDB(QObject *parent = nullptr);
+    explicit AdminDB(QObject *parent = nullptr); // Constructor sin parámetros
+    ~AdminDB();
 
     bool validarUsuario(const QString &usuario, const QString &clave);
-    QSqlDatabase getDB() const;
-    bool registrar(QString evento);  // <-- Declaración de la función registrar
+
+private slots:
+    void handleLoginResponse(QNetworkReply *reply);
 
 private:
-    QSqlDatabase db;
-    bool conectar(const QString &archivoSqlite);
+    QNetworkAccessManager *networkManager;
+    QString endpointUrl = "http://127.0.0.1:8000/login"; // URL por defecto
+    bool loginValido;
+    QEventLoop eventLoop;
 };
 
 #endif // ADMINDB_H
+
